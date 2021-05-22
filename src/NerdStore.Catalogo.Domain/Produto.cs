@@ -48,7 +48,7 @@ namespace NerdStore.Catalogo.Domain
 
         public void AlterarDescricao(string descricao)
         {
-            Validacoes.ValidarSeVazio(Descricao, $"O campo Descricao do Produto não pode ser vazio.");
+            Validacoes.ValidarSeVazio(descricao, $"O campo Descricao do Produto não pode ser vazio.");
 
             Descricao = descricao;
         }
