@@ -52,9 +52,9 @@ namespace NerdStore.Catalogo.Domain.Tests
             Assert.Null(ex);
         }
 
-        [Fact(DisplayName = "Validar Produto - Retorna exceptions")]
+        [Fact(DisplayName = "Validar Produto - Lança exceptions")]
         [Trait("Unit", "Catalogo.Domain - Produto")]
-        public void Produto_Validar_ValidacoesDevemRetornarExceptions()
+        public void Produto_Validar_ValidacoesDevemLancarExceptions()
         {
             var ex = Assert.Throws<DomainException>(() =>
                 new Produto(string.Empty, "Descricao", false, 100, Guid.NewGuid(), DateTime.Now, "Imagem", new Dimensoes(1, 1, 1))
@@ -145,9 +145,9 @@ namespace NerdStore.Catalogo.Domain.Tests
             Assert.Equal("Descricao 456", produto.Descricao);
         }
 
-        [Fact(DisplayName = "Alterar descrição do Produto - Retorna exception")]
+        [Fact(DisplayName = "Alterar descrição do Produto - Lança exception")]
         [Trait("Unit", "Catalogo.Domain - Produto")]
-        public void Produto_AlterarDescricao_ValidacaoDevemRetornarException()
+        public void Produto_AlterarDescricao_ValidacaoDevemLancarException()
         {
             // Arrange
             var produto = _produto;
@@ -218,19 +218,15 @@ namespace NerdStore.Catalogo.Domain.Tests
             Assert.Equal(90, produto.QuantidadeEstoque);
         }
 
-        [Fact(DisplayName = "Debitar estoque")]
+        [Fact(DisplayName = "Debitar estoque - Lança exception")]
         [Trait("Unit", "Catalogo.Domain - Produto")]
-        public void Produto_DebitarEstoque_DeveRetornarException()
+        public void Produto_DebitarEstoque_DeveLançarException()
         {
             // Arrange
             var produto = _produto;
 
             // Act & Assert
-            var ex = Assert.Throws<DomainException>(() =>
-            {
-                produto.DebitarEstoque(10);
-            });
-
+            var ex = Assert.Throws<DomainException>(() => produto.DebitarEstoque(10));
             Assert.Equal("Estoque insuficiente.", ex.Message);
         }
     }
