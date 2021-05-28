@@ -21,7 +21,24 @@ namespace NerdStore.Vendas.Domain
         // EF Rel.
         public virtual ICollection<Pedido> Pedidos { get; private set; }
 
-        internal ValidationResult ValidarSeAplicavel()
+        // EF Contruct
+        protected Voucher()
+        { }
+
+        public Voucher(string codigo, decimal? percentual, decimal? valorDesconto, int quantidade,
+            TipoDescontoVoucher tipoDescontoVoucher, DateTime dataValidade, bool ativo, bool utilizado)
+        {
+            Codigo = codigo;
+            Percentual = percentual;
+            ValorDesconto = valorDesconto;
+            Quantidade = quantidade;
+            TipoDescontoVoucher = tipoDescontoVoucher;
+            DataValidade = dataValidade;
+            Ativo = ativo;
+            Utilizado = utilizado;
+        }
+
+        public ValidationResult ValidarSeAplicavel()
         {
             return new VoucherAplicavelValidator().Validate(this);
         }

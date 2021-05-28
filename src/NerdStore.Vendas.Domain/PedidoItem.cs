@@ -20,10 +20,17 @@ namespace NerdStore.Vendas.Domain
 
         public PedidoItem(Guid produtoId, string produtoNome, int quantidade, decimal valorUnitario)
         {
+            ValidarQuantidadeUnidadesPermitida(quantidade);
+
             ProdutoId = produtoId;
             ProdutoNome = produtoNome;
             Quantidade = quantidade;
             ValorUnitario = valorUnitario;
+        }
+
+        private void ValidarQuantidadeUnidadesPermitida(int quantidade)
+        {
+            if (quantidade < Pedido.MIN_UNIDADES_ITEM) throw new DomainException($"Mínimo de {Pedido.MIN_UNIDADES_ITEM} unidades por produto");
         }
 
         internal void AssociarPedido(Guid pedidoId)
