@@ -11,14 +11,30 @@ namespace NerdStore.Vendas.Domain.Tests
         public void Voucher_ValidarVoucherTipoValor_DeveEstarValido()
         {
             // Arrange
-            var voucher = new Voucher("PROMO-15-REAIS", null, 15, 1,
-                TipoDescontoVoucher.Valor, DateTime.Now.AddDays(15), true, false);
+            var codigo = "PROMO-15-REAIS";
+            var valorDesconto = 15;
+            var quantidade = 1;
+            var tipoDescontoVoucher = TipoDescontoVoucher.Valor;
+            var dataValidade = DateTime.Now.AddDays(15);
+            var ativo = true;
+            var utilizado = false;
+
+            var voucher = new Voucher(codigo, null, valorDesconto, quantidade,
+                tipoDescontoVoucher, dataValidade, ativo, utilizado);
 
             // Act
             var result = voucher.ValidarSeAplicavel();
 
             // Assert
             Assert.True(result.IsValid);
+            Assert.Equal(codigo, voucher.Codigo);
+            Assert.Null(voucher.Percentual);
+            Assert.Equal(valorDesconto, voucher.ValorDesconto);
+            Assert.Equal(quantidade, voucher.Quantidade);
+            Assert.Equal(tipoDescontoVoucher, voucher.TipoDescontoVoucher);
+            Assert.Equal(dataValidade, voucher.DataValidade);
+            Assert.True(voucher.Ativo);
+            Assert.False(voucher.Utilizado);
         }
 
         [Fact(DisplayName = "Validar Voucher Tipo Valor Inválido")]
