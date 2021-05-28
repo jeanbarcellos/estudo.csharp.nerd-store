@@ -55,6 +55,7 @@ namespace NerdStore.Vendas.Domain
 
         public override bool EhValido()
         {
+            // TO-DO Escrever validação ...
             return true;
         }
     }

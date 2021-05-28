@@ -27,8 +27,8 @@ namespace NerdStore.Vendas.Domain
         public PedidoStatus PedidoStatus { get; private set; }
 
         // Para não expor a lista, a fim de não ser manipulada externamente
-        private readonly List<PedidoItem> _pedidoItems; // Lista Interna
-        public IReadOnlyCollection<PedidoItem> PedidoItems => _pedidoItems; // Lista Externa
+        private readonly List<PedidoItem> _pedidoItens; // Lista Interna
+        public IReadOnlyCollection<PedidoItem> PedidoItens => _pedidoItens; // Lista Externa
 
         // EF Relation
         public virtual Voucher Voucher { get; private set; }
@@ -40,7 +40,7 @@ namespace NerdStore.Vendas.Domain
         // EF Contruct
         protected Pedido()
         {
-            _pedidoItems = new List<PedidoItem>();
+            _pedidoItens = new List<PedidoItem>();
         }
 
         public Pedido(Guid clienteId, bool voucherUtilizado, decimal desconto, decimal valorTotal)
@@ -49,7 +49,7 @@ namespace NerdStore.Vendas.Domain
             VoucherUtilizado = voucherUtilizado;
             Desconto = desconto;
             ValorTotal = valorTotal;
-            _pedidoItems = new List<PedidoItem>();
+            _pedidoItens = new List<PedidoItem>();
         }
 
         #endregion
@@ -70,8 +70,8 @@ namespace NerdStore.Vendas.Domain
 
         public void CalcularValorPedido()
         {
-            // ValorTotal = PedidoItems.Sum(p => p.CalcularValor());
-            ValorTotal = _pedidoItems.Sum(p => p.CalcularValor());
+            // ValorTotal = PedidoItens.Sum(p => p.CalcularValor());
+            ValorTotal = _pedidoItens.Sum(p => p.CalcularValor());
             CalcularValorTotalDesconto();
         }
 
@@ -105,7 +105,7 @@ namespace NerdStore.Vendas.Domain
 
         public bool PedidoItemExistente(PedidoItem pedidoItem)
         {
-            return _pedidoItems.Any(p => p.ProdutoId == pedidoItem.ProdutoId);
+            return _pedidoItens.Any(p => p.ProdutoId == pedidoItem.ProdutoId);
         }
 
         public void AdicionarItem(PedidoItem pedidoItem)
@@ -117,18 +117,18 @@ namespace NerdStore.Vendas.Domain
 
             if (PedidoItemExistente(pedidoItem))
             {
-                var itemExistente = _pedidoItems.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId);
+                var itemExistente = _pedidoItens.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId);
 
                 itemExistente.AdicionarUnidades(pedidoItem.Quantidade);
 
                 pedidoItem = itemExistente;
 
-                _pedidoItems.Remove(itemExistente);
+                _pedidoItens.Remove(itemExistente);
             }
 
             pedidoItem.CalcularValor();
 
-            _pedidoItems.Add(pedidoItem);
+            _pedidoItens.Add(pedidoItem);
 
             CalcularValorPedido();
         }
@@ -138,7 +138,7 @@ namespace NerdStore.Vendas.Domain
             if (!pedidoItem.EhValido()) return;
             ValidarPedidoItemInexistente(pedidoItem);
 
-            _pedidoItems.Remove(pedidoItem);
+            _pedidoItens.Remove(pedidoItem);
 
             CalcularValorPedido();
         }
@@ -151,10 +151,10 @@ namespace NerdStore.Vendas.Domain
 
             pedidoItem.AssociarPedido(Id);
 
-            var itemExistente = _pedidoItems.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId);
+            var itemExistente = _pedidoItens.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId);
 
-            _pedidoItems.Remove(itemExistente);
-            _pedidoItems.Add(pedidoItem);
+            _pedidoItens.Remove(itemExistente);
+            _pedidoItens.Add(pedidoItem);
 
             CalcularValorPedido();
         }
@@ -204,7 +204,7 @@ namespace NerdStore.Vendas.Domain
             var quantidadeItems = pedidoItem.Quantidade;
             if (PedidoItemExistente(pedidoItem))
             {
-                var itemExistente = _pedidoItems.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId);
+                var itemExistente = _pedidoItens.FirstOrDefault(p => p.ProdutoId == pedidoItem.ProdutoId);
                 quantidadeItems += itemExistente.Quantidade;
             }
 
