@@ -1,4 +1,5 @@
-﻿using NerdStore.Core.DomainObjects;
+﻿using FluentValidation.Results;
+using NerdStore.Core.DomainObjects;
 using System;
 
 namespace NerdStore.Vendas.Domain
@@ -30,7 +31,7 @@ namespace NerdStore.Vendas.Domain
 
         private void ValidarQuantidadeUnidadesPermitida(int quantidade)
         {
-            if (quantidade < Pedido.MIN_UNIDADES_ITEM) throw new DomainException($"Mínimo de {Pedido.MIN_UNIDADES_ITEM} unidades por produto");
+            if (quantidade < Pedido.MIN_UNIDADES_ITEM) throw new DomainException(PedidoItemValidator.QuantidadeErrorMessage);
         }
 
         internal void AssociarPedido(Guid pedidoId)
@@ -55,8 +56,9 @@ namespace NerdStore.Vendas.Domain
 
         public override bool EhValido()
         {
-            // TO-DO Escrever validação ...
-            return true;
+            var validationResult = new PedidoItemValidator().Validate(this);
+
+            return validationResult.IsValid;
         }
     }
 }

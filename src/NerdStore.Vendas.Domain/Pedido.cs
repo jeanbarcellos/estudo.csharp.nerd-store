@@ -8,14 +8,14 @@ namespace NerdStore.Vendas.Domain
 {
     public class Pedido : Entity, IAggregateRoot
     {
-        #region Parâmetros de Classe
+        #region Atributos de Classe
 
         public static int MAX_UNIDADES_ITEM => 15;
         public static int MIN_UNIDADES_ITEM => 1;
 
         #endregion
 
-        #region Parâmetros de Instância
+        #region Atributos de Instância
 
         public int Codigo { get; private set; }
         public Guid ClienteId { get; private set; }
@@ -55,53 +55,6 @@ namespace NerdStore.Vendas.Domain
         #endregion
 
         #region Métodos de comportamentos
-
-        public ValidationResult AplicarVoucher(Voucher voucher)
-        {
-            var validationResult = voucher.ValidarSeAplicavel();
-            if (!validationResult.IsValid) return validationResult;
-
-            Voucher = voucher;
-            VoucherUtilizado = true;
-            CalcularValorPedido();
-
-            return validationResult;
-        }
-
-        public void CalcularValorPedido()
-        {
-            // ValorTotal = PedidoItens.Sum(p => p.CalcularValor());
-            ValorTotal = _pedidoItens.Sum(p => p.CalcularValor());
-            CalcularValorTotalDesconto();
-        }
-
-        public void CalcularValorTotalDesconto()
-        {
-            if (!VoucherUtilizado) return;
-
-            var desconto = 0M;
-            var valor = ValorTotal;
-
-            if (Voucher.TipoDescontoVoucher == TipoDescontoVoucher.Porcentagem)
-            {
-                if (Voucher.Percentual.HasValue)
-                {
-                    desconto = (valor * Voucher.Percentual.Value) / 100;
-                    valor -= desconto;
-                }
-            }
-            else
-            {
-                if (Voucher.ValorDesconto.HasValue)
-                {
-                    desconto = Voucher.ValorDesconto.Value;
-                    valor -= desconto;
-                }
-            }
-
-            ValorTotal = valor < 0 ? 0 : valor;
-            Desconto = desconto;
-        }
 
         public bool PedidoItemExistente(PedidoItem pedidoItem)
         {
@@ -164,6 +117,53 @@ namespace NerdStore.Vendas.Domain
             pedidoItem.AtualizarUnidades(unidades);
 
             AtualizarItem(pedidoItem);
+        }
+
+        public ValidationResult AplicarVoucher(Voucher voucher)
+        {
+            var validationResult = voucher.ValidarSeAplicavel();
+            if (!validationResult.IsValid) return validationResult;
+
+            Voucher = voucher;
+            VoucherUtilizado = true;
+            CalcularValorPedido();
+
+            return validationResult;
+        }
+
+        public void CalcularValorPedido()
+        {
+            // ValorTotal = PedidoItens.Sum(p => p.CalcularValor());
+            ValorTotal = _pedidoItens.Sum(p => p.CalcularValor());
+            CalcularValorTotalDesconto();
+        }
+
+        private void CalcularValorTotalDesconto()
+        {
+            if (!VoucherUtilizado) return;
+
+            var desconto = 0M;
+            var valor = ValorTotal;
+
+            if (Voucher.TipoDescontoVoucher == TipoDescontoVoucher.Porcentagem)
+            {
+                if (Voucher.Percentual.HasValue)
+                {
+                    desconto = (valor * Voucher.Percentual.Value) / 100;
+                    valor -= desconto;
+                }
+            }
+            else
+            {
+                if (Voucher.ValorDesconto.HasValue)
+                {
+                    desconto = Voucher.ValorDesconto.Value;
+                    valor -= desconto;
+                }
+            }
+
+            ValorTotal = valor < 0 ? 0 : valor;
+            Desconto = desconto;
         }
 
         #endregion
