@@ -58,17 +58,15 @@ namespace NerdStore.Vendas.Application.Commands
 
                 if (pedidoItemExistente)
                 {
-                    _pedidoRepository.AtualizarItem(
-                        pedido.PedidoItens.FirstOrDefault(x => x.ProdutoId == pedidoItem.ProdutoId)
-                    );
+                    _pedidoRepository.AtualizarItem(pedido.PedidoItens.FirstOrDefault(x => x.ProdutoId == pedidoItem.ProdutoId));
                 }
                 else
                 {
                     _pedidoRepository.AdicionarItem(pedidoItem);
                 }
 
-                // pedido.AdicionarEvento(new PedidoAtualizadoEvent(pedido.ClienteId, pedido.Id, pedido.ValorTotal));
-
+                // #TODO# - No projeto de testes este método é chamado
+                _pedidoRepository.Atualizar(pedido);
             }
 
             pedido.AdicionarEvento(new PedidoProdutoAdicionadoEvent(pedido.ClienteId, pedido.Id, message.ProdutoId, message.Nome, message.ValorUnitario, message.Quantidade));
@@ -98,7 +96,6 @@ namespace NerdStore.Vendas.Application.Commands
 
             pedido.AtualizarUnidades(pedidoItem, message.Quantidade);
 
-            // pedido.AdicionarEvento(new PedidoAtualizadoEvent(pedido.ClienteId, pedido.Id, pedido.ValorTotal));
             pedido.AdicionarEvento(new PedidoProdutoAtualizadoEvent(message.ClienteId, pedido.Id, message.ProdutoId, message.Quantidade));
 
             _pedidoRepository.AtualizarItem(pedidoItem);
@@ -129,7 +126,6 @@ namespace NerdStore.Vendas.Application.Commands
 
             pedido.RemoverItem(pedidoItem);
 
-            // pedido.AdicionarEvento(new PedidoAtualizadoEvent(pedido.ClienteId, pedido.Id, pedido.ValorTotal));
             pedido.AdicionarEvento(new PedidoProdutoRemovidoEvent(message.ClienteId, pedido.Id, message.ProdutoId));
 
             _pedidoRepository.RemoverItem(pedidoItem);
@@ -167,7 +163,6 @@ namespace NerdStore.Vendas.Application.Commands
                 return false;
             }
 
-            // pedido.AdicionarEvento(new PedidoAtualizadoEvent(pedido.ClienteId, pedido.Id, pedido.ValorTotal));
             pedido.AdicionarEvento(new PedidoVoucherAplicadoEvent(pedido.ClienteId, pedido.Id, voucher.Id));
 
             _pedidoRepository.Atualizar(pedido);
@@ -186,7 +181,6 @@ namespace NerdStore.Vendas.Application.Commands
             pedido.PedidoItens.ForEach(i => itensList.Add(new Item { Id = i.ProdutoId, Quantidade = i.Quantidade }));
             var listaProdutosPedido = new ListaProdutosPedido { PedidoId = pedido.Id, Itens = itensList };
 
-            // pedido.AdicionarEvento(new PedidoAtualizadoEvent(pedido.ClienteId, pedido.Id, pedido.ValorTotal));
             pedido.AdicionarEvento(new PedidoIniciadoEvent(pedido.Id, pedido.ClienteId, pedido.ValorTotal, listaProdutosPedido, message.NomeCartao, message.NumeroCartao, message.ExpiracaoCartao, message.CVVCartao));
 
             _pedidoRepository.Atualizar(pedido);
@@ -206,6 +200,7 @@ namespace NerdStore.Vendas.Application.Commands
             }
 
             pedido.FinalizarPedido();
+
             pedido.AdicionarEvento(new PedidoFinalizadoEvent(message.PedidoId));
 
             return await _pedidoRepository.UnitOfWork.Commit();
