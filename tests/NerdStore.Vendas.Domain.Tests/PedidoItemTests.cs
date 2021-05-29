@@ -11,13 +11,35 @@ namespace NerdStore.Vendas.Domain.Tests
         public void PedidoItem_ValidarPedidoItem_DeveEstarValido()
         {
             // Arrange
-            var pedidoItem = new PedidoItem(Guid.NewGuid(), "Produto Teste", Pedido.MIN_UNIDADES_ITEM + 1, 100);
+            var produtoId = Guid.NewGuid();
+            var produtoNome = "Produto Teste";
+            var quantidade = Pedido.MIN_UNIDADES_ITEM + 1;
+            var valorUnitario = 10;
+            var pedidoItem = new PedidoItem(produtoId, produtoNome, quantidade, valorUnitario);
 
             // Act
             var result = pedidoItem.EhValido();
 
             // Assert
             Assert.True(result);
+            Assert.Equal(produtoId, pedidoItem.ProdutoId);
+            Assert.Equal(produtoNome, pedidoItem.ProdutoNome);
+            Assert.Equal(quantidade, pedidoItem.Quantidade);
+            Assert.Equal(valorUnitario, pedidoItem.ValorUnitario);
+        }
+
+        [Fact(DisplayName = "Validar PedidoItem que deverá estar inválido")]
+        [Trait("Unit", "Vendas.Domain - PedidoItem")]
+        public void PedidoItem_ValidarPedidoItem_DeveEstarInvalido()
+        {
+            // Arrange
+            var pedidoItem = new PedidoItem(Guid.Empty, "", Pedido.MIN_UNIDADES_ITEM, 0);
+
+            // Act
+            var result = pedidoItem.EhValido();
+
+            // Assert
+            Assert.False(result);
         }
 
         [Fact(DisplayName = "Noto Item Pedido com unidades abaixo do permitido")]
@@ -25,7 +47,8 @@ namespace NerdStore.Vendas.Domain.Tests
         public void AdicionarItemPedido_UnidadesItemAbaixoDoPermitido_DeveRetornarException()
         {
             // Arrange & Act & Assert
-            Assert.Throws<DomainException>(() => new PedidoItem(Guid.NewGuid(), "Produto Teste", Pedido.MIN_UNIDADES_ITEM - 1, 100));
+            var ex = Assert.Throws<DomainException>(() => new PedidoItem(Guid.NewGuid(), "Produto Teste", Pedido.MIN_UNIDADES_ITEM - 1, 100));
+            Assert.Equal(PedidoItemValidator.QuantidadeErrorMessage, ex.Message);
         }
 
         [Fact(DisplayName = "Calcular o valor do Item Pedido")]

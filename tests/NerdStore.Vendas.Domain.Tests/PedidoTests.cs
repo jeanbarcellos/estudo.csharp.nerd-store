@@ -7,6 +7,8 @@ namespace NerdStore.Vendas.Domain.Tests
 {
     public class PedidoTests
     {
+        #region Manipulação de Itens
+
         [Fact(DisplayName = "Adicionar Item Novo Pedido")]
         [Trait("Unit", "Vendas.Domain - Pedido")]
         public void AdicionarItemPedido_NovoPedido_DeveAtualizarValor()
@@ -174,6 +176,10 @@ namespace NerdStore.Vendas.Domain.Tests
             Assert.Equal(totalPedido, pedido.ValorTotal);
         }
 
+        #endregion
+
+        #region Utiização do Voucher
+
         [Fact(DisplayName = "Aplicar voucher válido")]
         [Trait("Unit", "Vendas.Domain - Pedido")]
         public void Pedido_AplicarVoucherValido_DeveRetornarSemErros()
@@ -298,5 +304,78 @@ namespace NerdStore.Vendas.Domain.Tests
             Assert.Equal(totalEsperado, pedido.ValorTotal);
         }
 
+        #endregion
+
+        [Fact(DisplayName = "Calcular o valor total do pedido")]
+        [Trait("Unit", "Vendas.Domain - Pedido")]
+        public void Pedido_CalcularValorPedido_DeveCalcularValorTotalDoPedido()
+        {
+            // Arrange
+            var pedido = Pedido.PedidoFactory.NovoPedidoRascunho(Guid.NewGuid());
+            var pedidoItem1 = new PedidoItem(Guid.NewGuid(), "Produto Xpto", 2, 100);
+            var pedidoItem2 = new PedidoItem(Guid.NewGuid(), "Produto ABC", 2, 300);
+            pedido.AdicionarItem(pedidoItem1);
+            pedido.AdicionarItem(pedidoItem2);
+
+            // Act
+            pedido.CalcularValorPedido();
+
+            // Assert
+            //var totalEsperado = pedido.PedidoItens.Sum(i => i.Quantidade * i.ValorUnitario); // 800
+            var totalEsperado = 800;
+            Assert.Equal(totalEsperado, pedido.ValorTotal);
+
+        }
+
+        [Fact(DisplayName = "Atualizar unidades de um produdo do pedido do pedido")]
+        [Trait("Unit", "Vendas.Domain - Pedido")]
+        public void Pedido_AtualizarUnidades_DeveALterarUnidadesDoPedido()
+        {
+            // Arrange
+            var pedido = Pedido.PedidoFactory.NovoPedidoRascunho(Guid.NewGuid());
+            var pedidoItem1 = new PedidoItem(Guid.NewGuid(), "Produto Xpto", 2, 100);
+            var pedidoItem2 = new PedidoItem(Guid.NewGuid(), "Produto ABC", 2, 300);
+            pedido.AdicionarItem(pedidoItem1);
+            pedido.AdicionarItem(pedidoItem2);
+
+            // Act
+            pedido.AtualizarUnidades(pedidoItem1, 1);
+
+            // Assert
+            //var totalEsperado = pedido.PedidoItens.Sum(i => i.Quantidade * i.ValorUnitario); // 800
+            var totalEsperado = 700;
+            Assert.Equal(totalEsperado, pedido.ValorTotal);
+        }
+
+        [Fact(DisplayName = "Verificar se o Item existe no pedido")]
+        [Trait("Unit", "Vendas.Domain - Pedido")]
+        public void Pedido_PedidoItemExistente_ItemDeveExistir()
+        {
+            // Arrange
+            var pedido = Pedido.PedidoFactory.NovoPedidoRascunho(Guid.NewGuid());
+            var pedidoItem = new PedidoItem(Guid.NewGuid(), "Produto Xpto", 2, 100);
+            pedido.AdicionarItem(pedidoItem);
+
+            // Act
+            var result = pedido.PedidoItemExistente(pedidoItem);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        [Fact(DisplayName = "Verificar se o Item não existe no pedido")]
+        [Trait("Unit", "Vendas.Domain - Pedido")]
+        public void Pedido_PedidoItemExistente_ItemNaoDeveExistir()
+        {
+            // Arrange
+            var pedido = Pedido.PedidoFactory.NovoPedidoRascunho(Guid.NewGuid());
+            var pedidoItem = new PedidoItem(Guid.NewGuid(), "Produto Xpto", 2, 100);
+
+            // Act
+            var result = pedido.PedidoItemExistente(pedidoItem);
+
+            // Assert
+            Assert.False(result);
+        }
     }
 }
