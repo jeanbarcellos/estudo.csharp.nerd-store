@@ -25,15 +25,18 @@ namespace NerdStore.Vendas.Application.Commands
 
     public class RemoverItemPedidoValidator : AbstractValidator<RemoverItemPedidoCommand>
     {
+        public static string IdClienteErroMsg => "Id do cliente inválido.";
+        public static string IdProdutoErroMsg => "Id do produto inválido.";
+
         public RemoverItemPedidoValidator()
         {
             RuleFor(p => p.ClienteId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do cliente inválido.");
+                .WithMessage(IdClienteErroMsg);
 
             RuleFor(p => p.ProdutoId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do produto inválido.");
+                .WithMessage(IdProdutoErroMsg);
         }
     }
 }

@@ -34,35 +34,43 @@ namespace NerdStore.Vendas.Application.Commands
 
     public class IniciarPedidoValidator : AbstractValidator<IniciarPedidoCommand>
     {
+        public static string IdClienteErroMsg => "Id do cliente inválido.";
+        public static string IdPedidoErroMsg => "Id do pedido inválido.";
+        public static string NomeCartaoErroMsg => "O nome do cartão não foi informado.";
+        public static string NumeroCartaoNotEmptyMsg => "O número do cartão não foi informado.";
+        public static string NumeroCartaoErroMsg => "Número de cartão de crédito inválido.";
+        public static string ExpiracaoCartaoErroMsg => "O data de exipração não foi informado.";
+        public static string CVVCartaoErroMsg => "O CVV não foi preenchido corretamente.";
+
         public IniciarPedidoValidator()
         {
             RuleFor(p => p.ClienteId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do cliente inválido.");
+                .WithMessage(IdClienteErroMsg);
 
             RuleFor(p => p.PedidoId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do pedido inválido.");
+                .WithMessage(IdPedidoErroMsg);
 
             RuleFor(p => p.NomeCartao)
                 .NotEmpty()
-                .WithMessage("O nome do cartão não foi informado.");
+                .WithMessage(NomeCartaoErroMsg);
 
             RuleFor(p => p.NumeroCartao)
                 .NotEmpty()
-                .WithMessage("O número do cartão não foi informado.");
+                .WithMessage(NumeroCartaoNotEmptyMsg);
 
             RuleFor(p => p.NumeroCartao)
                 .CreditCard()
-                .WithMessage("Número de cartão de crédito inválido.");
+                .WithMessage(NumeroCartaoErroMsg);
 
             RuleFor(p => p.ExpiracaoCartao)
                 .NotEmpty()
-                .WithMessage("O data de expração não foi informado.");
+                .WithMessage(ExpiracaoCartaoErroMsg);
 
             RuleFor(p => p.CVVCartao)
                 .Length(3 ,4)
-                .WithMessage("O CVV não foi preenchido corretamente.");
+                .WithMessage(CVVCartaoErroMsg);
         }
     }
 }

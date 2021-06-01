@@ -26,15 +26,18 @@ namespace NerdStore.Vendas.Application.Commands
 
     public class CancelarProcessamentoPedidoValidator : AbstractValidator<CancelarProcessamentoPedidoCommand>
     {
+        public static string IdClienteErroMsg => "Id do cliente inválido.";
+        public static string IdPedidoErroMsg => "Id do pedido inválido.";
+
         public CancelarProcessamentoPedidoValidator()
         {
             RuleFor(p => p.ClienteId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do cliente inválido.");
+                .WithMessage(IdClienteErroMsg);
 
             RuleFor(p => p.PedidoId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do pedido inválido.");
+                .WithMessage(IdPedidoErroMsg);
         }
     }
 }

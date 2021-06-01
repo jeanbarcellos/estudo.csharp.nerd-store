@@ -26,20 +26,18 @@ namespace NerdStore.Vendas.Application.Commands
 
     public class FinalizarPedidoValidator : AbstractValidator<FinalizarPedidoCommand>
     {
+        public static string IdClienteErroMsg => "Id do cliente inválido.";
+        public static string IdPedidoErroMsg => "Id do pedido inválido.";
+
         public FinalizarPedidoValidator()
         {
             RuleFor(p => p.ClienteId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do cliente inválido.");
+                .WithMessage(IdClienteErroMsg);
 
             RuleFor(p => p.PedidoId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do pedido inválido.");
-        }
-
-        private object RuleFor(Func<object, object> p)
-        {
-            throw new NotImplementedException();
+                .WithMessage(IdPedidoErroMsg);
         }
     }
 }

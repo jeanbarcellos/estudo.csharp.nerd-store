@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentValidation;
 using NerdStore.Core.Messages;
+using NerdStore.Vendas.Domain;
 
 namespace NerdStore.Vendas.Application.Commands
 {
@@ -28,23 +29,28 @@ namespace NerdStore.Vendas.Application.Commands
 
     public class AtualizarItemPedidoValidator : AbstractValidator<AtualizarItemPedidoCommand>
     {
+        public static string IdClienteErroMsg => "Id do cliente inválido";
+        public static string IdProdutoErroMsg => "Id do produto inválido";
+        public static string QtdMinErroMsg => $"A quantidade miníma de um item é {Pedido.MIN_UNIDADES_ITEM}";
+        public static string QtdMaxErroMsg => $"A quantidade máxima de um item é {Pedido.MAX_UNIDADES_ITEM}";
+
         public AtualizarItemPedidoValidator()
         {
             RuleFor(p => p.ClienteId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do cliente inválido.");
+                .WithMessage(IdClienteErroMsg);
 
             RuleFor(p => p.ProdutoId)
                 .NotEqual(Guid.Empty)
-                .WithMessage("Id do produto inválido.");
+                .WithMessage(IdProdutoErroMsg);
 
             RuleFor(c => c.Quantidade)
-                .GreaterThan(0)
-                .WithMessage("A quantidade mínima de um item é 1.");
+                .GreaterThanOrEqualTo(Pedido.MIN_UNIDADES_ITEM)
+                .WithMessage(QtdMinErroMsg);
 
             RuleFor(c => c.Quantidade)
-                .LessThan(15)
-                .WithMessage("A quantidade máxima de um item é 15.");
+                .LessThanOrEqualTo(Pedido.MAX_UNIDADES_ITEM)
+                .WithMessage(QtdMaxErroMsg);
         }
     }
 }
