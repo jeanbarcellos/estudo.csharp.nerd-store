@@ -51,7 +51,6 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             Assert.True(result);
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.Adicionar(It.IsAny<Pedido>()), Times.Once);
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
-            // _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Once);
         }
 
         [Fact(DisplayName = "Adicionar Item Novo ao Pedido Rascunho com Sucesso")]
