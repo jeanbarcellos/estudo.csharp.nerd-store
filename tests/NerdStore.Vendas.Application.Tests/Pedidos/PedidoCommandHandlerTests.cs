@@ -19,6 +19,7 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
         private readonly Pedido _pedido;
         private readonly AutoMocker _mocker;
         private readonly PedidoCommandHandler _pedidoHandler;
+        private readonly Voucher _voucherTipoValor;
 
         public PedidoCommandHandlerTests()
         {
@@ -29,6 +30,8 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _produtoId = Guid.NewGuid();
 
             _pedido = Pedido.PedidoFactory.NovoPedidoRascunho(_clienteId);
+
+            _voucherTipoValor = new Voucher("PROMO-15-REAIS", null, 15, 10, TipoDescontoVoucher.Valor, DateTime.Now.AddDays(15), true, false);
         }
 
         #region AdicionarItemPedidoCommand tests
@@ -126,7 +129,7 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
 
         #region AtualizarItemPedidoCommand tests
 
-        [Fact(DisplayName = "Atualizar Item Existente do Pedido Existe com Sucesso")]
+        [Fact(DisplayName = "Atualizar Item Existente do Pedido Existente com Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
         public async Task AtualizarItem_ItemExistenteAoPedidoExistente_DeveExecutarComSucesso()
         {
@@ -212,7 +215,7 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
 
         #region RemoverItemPedidoCommand tests
 
-        [Fact(DisplayName = "Remover Item Existente do Pedido Existe com Sucesso")]
+        [Fact(DisplayName = "Remover Item Existente do Pedido Existente com Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
         public async Task RemoverItem_ItemExistenteAoPedidoExistente_DeveExecutarComSucesso()
         {
@@ -280,6 +283,132 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.ObterItemPorPedido(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
             _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Once);
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.RemoverItem(It.IsAny<PedidoItem>()), Times.Never);
+        }
+
+        [Fact(DisplayName = "Remover Item Command Inválido")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task RemoverItem_CommandInvalido_DeveRetornarFalsoELancarEventosDeNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new RemoverItemPedidoCommand(Guid.Empty, Guid.Empty);
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(2));
+        }
+
+        #endregion
+
+        #region AplicarVoucherPedidoCommand tests
+
+        [Fact(DisplayName = "Aplicar Voucher Existente ao Pedido Existente com Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task AplicarVoucher_VoucherExistenteAoPedidoExistente_DeveExecutarComSucesso()
+        {
+            // Arrange
+            var pedidoCommand = new AplicarVoucherPedidoCommand(_clienteId, _voucherTipoValor.Codigo);
+
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterPedidoRascunhoPorClienteId(_clienteId))
+                .Returns(Task.FromResult(_pedido));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterVoucherPorCodigo(_voucherTipoValor.Codigo))
+                .Returns(Task.FromResult(_voucherTipoValor));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.UnitOfWork.Commit())
+                .Returns(Task.FromResult(true));
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            Assert.True(result);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.Atualizar(It.IsAny<Pedido>()), Times.Once);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Never);
+        }
+
+        [Fact(DisplayName = "Aplicar Voucher Existente ao do Pedido Inexistente com Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task AplicarVoucher_VoucherExistenteAoPedidoInexistente_DeveOcorrerErroELancarNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new AplicarVoucherPedidoCommand(_clienteId, _voucherTipoValor.Codigo);
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Once);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.ObterVoucherPorCodigo(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact(DisplayName = "Aplicar Voucher inexistente ao Pedido Existente com Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task AplicarVoucher_VoucherInexistenteAoPedidoExistente_DeveExecutarComSucesso()
+        {
+            // Arrange
+            var pedidoCommand = new AplicarVoucherPedidoCommand(_clienteId, _voucherTipoValor.Codigo);
+
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterPedidoRascunhoPorClienteId(_clienteId))
+                .Returns(Task.FromResult(_pedido));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.UnitOfWork.Commit())
+                .Returns(Task.FromResult(true));
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Once);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.Atualizar(It.IsAny<Pedido>()), Times.Never);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Never);
+        }
+
+        [Fact(DisplayName = "Aplicar Voucher expirado ao Pedido Existente com Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task AplicarVoucher_VoucherExpiradoAoPedidoExistente_DeveExecutarComSucesso()
+        {
+            // Arrange
+            var voucherInvalido = new Voucher("PROMO-15-REAIS", null, null, 0, TipoDescontoVoucher.Valor, DateTime.Now.AddDays(-1), false, true);
+            var pedidoCommand = new AplicarVoucherPedidoCommand(_clienteId, voucherInvalido.Codigo);
+
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterPedidoRascunhoPorClienteId(_clienteId))
+                .Returns(Task.FromResult(_pedido));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterVoucherPorCodigo(voucherInvalido.Codigo))
+                .Returns(Task.FromResult(voucherInvalido));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.UnitOfWork.Commit())
+                .Returns(Task.FromResult(true));
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(5));
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.Atualizar(It.IsAny<Pedido>()), Times.Never);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Never);
+        }
+
+        [Fact(DisplayName = "Aplicar Voucher Command Inválido")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task AplicarVoucher_CommandInvalido_DeveRetornarFalsoELancarEventosDeNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new AplicarVoucherPedidoCommand(Guid.Empty, "");
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(2));
         }
 
         #endregion
