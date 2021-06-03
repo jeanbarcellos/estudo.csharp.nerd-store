@@ -159,7 +159,7 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
         }
 
-        [Fact(DisplayName = "Atualizar Item Existente do Pedido Inexistente com Sucesso")]
+        [Fact(DisplayName = "Atualizar Item Existente do Pedido Inexistente sem Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
         public async Task AtualizarItem_ItemExistenteAoPedidoInexistente_DeveOcorrerErroELancarNotificacao()
         {
@@ -175,7 +175,7 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.ObterItemPorPedido(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
         }
 
-        [Fact(DisplayName = "Atualizar Item Inexistente do Pedido Existente com Sucesso")]
+        [Fact(DisplayName = "Atualizar Item Inexistente do Pedido Existente sem Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
         public async Task AtualizarItem_ItemInexistenteApPedidoExistente_DeveOcorrerErroELancarNotificacao()
         {
@@ -245,7 +245,7 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
         }
 
-        [Fact(DisplayName = "Remover Item Existente do Pedido Inexistente com Sucesso")]
+        [Fact(DisplayName = "Remover Item Existente do Pedido Inexistente sem Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
         public async Task RemoverItem_ItemExistenteAoPedidoInexistente_DeveOcorrerErroELancarNotificacao()
         {
@@ -261,7 +261,7 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.ObterItemPorPedido(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
         }
 
-        [Fact(DisplayName = "Remover Item Inexistente do Pedido Existente com Sucesso")]
+        [Fact(DisplayName = "Remover Item Inexistente do Pedido Existente sem Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
         public async Task RemoverItem_ItemInexistenteAoPedidoExistente_DeveOcorrerErroELancarNotificacao()
         {
@@ -330,7 +330,7 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Never);
         }
 
-        [Fact(DisplayName = "Aplicar Voucher Existente ao do Pedido Inexistente com Sucesso")]
+        [Fact(DisplayName = "Aplicar Voucher Existente ao do Pedido Inexistente sem Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
         public async Task AplicarVoucher_VoucherExistenteAoPedidoInexistente_DeveOcorrerErroELancarNotificacao()
         {
@@ -346,9 +346,9 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.ObterVoucherPorCodigo(It.IsAny<string>()), Times.Never);
         }
 
-        [Fact(DisplayName = "Aplicar Voucher inexistente ao Pedido Existente com Sucesso")]
+        [Fact(DisplayName = "Aplicar Voucher inexistente ao Pedido Existente sem Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
-        public async Task AplicarVoucher_VoucherInexistenteAoPedidoExistente_DeveExecutarComSucesso()
+        public async Task AplicarVoucher_VoucherInexistenteAoPedidoExistente_DeveOcorrerErroELancarNotificacao()
         {
             // Arrange
             var pedidoCommand = new AplicarVoucherPedidoCommand(_clienteId, _voucherTipoValor.Codigo);
@@ -369,9 +369,9 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Never);
         }
 
-        [Fact(DisplayName = "Aplicar Voucher expirado ao Pedido Existente com Sucesso")]
+        [Fact(DisplayName = "Aplicar Voucher expirado ao Pedido Existente sem Sucesso")]
         [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
-        public async Task AplicarVoucher_VoucherExpiradoAoPedidoExistente_DeveExecutarComSucesso()
+        public async Task AplicarVoucher_VoucherExpiradoAoPedidoExistente_DeveOcorrerErroELancarNotificacao()
         {
             // Arrange
             var voucherInvalido = new Voucher("PROMO-15-REAIS", null, null, 0, TipoDescontoVoucher.Valor, DateTime.Now.AddDays(-1), false, true);
@@ -410,6 +410,239 @@ namespace NerdStore.Vendas.Application.Tests.Pedidos
             Assert.False(result);
             _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(2));
         }
+
+        #endregion
+
+        #region IniciarPedidoCommand tests
+
+        [Fact(DisplayName = "Iniciar Pedido com Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task IniciarPedido_PedidoRascunho_DeveExecutarComSucesso()
+        {
+            // Arrange
+            var pedidoItemExistente = new PedidoItem(_produtoId, "Produto Xpto", 2, 100);
+            _pedido.AdicionarItem(pedidoItemExistente);
+
+            var pedidoCommand = new IniciarPedidoCommand(_pedido.Id, _clienteId, 100.99m, "Nome do Cartão", "1111-2222-3333-4444", "10/23", "123");
+
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterPedidoRascunhoPorClienteId(_clienteId))
+                .Returns(Task.FromResult(_pedido));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.UnitOfWork.Commit())
+                .Returns(Task.FromResult(true));
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.True(result);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.Atualizar(It.IsAny<Pedido>()), Times.Once);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
+        }
+
+        [Fact(DisplayName = "Iniciar Pedido Command Inválido")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task IniciarPedido_CommandInvalido_DeveRetornarFalsoELancarEventosDeNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new IniciarPedidoCommand(Guid.Empty, Guid.Empty, 0, "", "", "", "");
+
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterPedidoRascunhoPorClienteId(_clienteId))
+                .Returns(Task.FromResult(_pedido));
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(6));
+        }
+
+        #endregion
+
+        #region FinalizarPedidoCommand tests
+
+        [Fact(DisplayName = "Finalizar Pedido Existente com Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task FinalizarPedido_PedidoExistente_DeveExecutarComSucesso()
+        {
+            // Arrange
+            var pedidoItemExistente = new PedidoItem(_produtoId, "Produto Xpto", 2, 100);
+            _pedido.AdicionarItem(pedidoItemExistente);
+
+            var pedidoCommand = new FinalizarPedidoCommand(_pedido.Id, _clienteId);
+
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterPorId(_pedido.Id))
+                .Returns(Task.FromResult(_pedido));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.UnitOfWork.Commit())
+                .Returns(Task.FromResult(true));
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.True(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Never);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
+        }
+
+        [Fact(DisplayName = "Finalizar Pedido Inexistente sem Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task FinalizarPedido_PedidoInexistente_DeveOcorrerErroELancarNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new FinalizarPedidoCommand(_pedido.Id, _clienteId);
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Once);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Never);
+        }
+
+        [Fact(DisplayName = "Finalizar Pedido Command Inválido")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task FinalizarPedido_CommandInvalido_DeveRetornarFalsoELancarEventosDeNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new FinalizarPedidoCommand(Guid.Empty, Guid.Empty);
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(2));
+        }
+
+        #endregion
+
+        #region CancelarProcessamentoPedidoEstornarEstoqueCommand tests
+
+        [Fact(DisplayName = "Cancelar Processamento do Pedido e Estornar Estoque com Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task CancelarProcessamentoPedidoEstornarEstoque_PedidoExistente_DeveExecutarComSucesso()
+        {
+            // Arrange
+            var pedidoItemExistente = new PedidoItem(_produtoId, "Produto Xpto", 2, 100);
+            _pedido.AdicionarItem(pedidoItemExistente);
+
+            var pedidoCommand = new CancelarProcessamentoPedidoEstornarEstoqueCommand(_pedido.Id, _clienteId);
+
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterPorId(_pedido.Id))
+                .Returns(Task.FromResult(_pedido));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.UnitOfWork.Commit())
+                .Returns(Task.FromResult(true));
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.True(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Never);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
+        }
+
+        [Fact(DisplayName = "Cancelar Processamento do Pedido e Estornar Estoque sem Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task CancelarProcessamentoPedidoEstornarEstoque_PedidoInexistente_DeveOcorrerErroELancarNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new CancelarProcessamentoPedidoEstornarEstoqueCommand(_pedido.Id, _clienteId);
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Once);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Never);
+        }
+
+        [Fact(DisplayName = "Cancelar Processamento do Pedido e Estornar Estoque Command Inválido")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task CancelarProcessamentoPedidoEstornarEstoque_CommandInvalido_DeveRetornarFalsoELancarEventosDeNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new CancelarProcessamentoPedidoEstornarEstoqueCommand(Guid.Empty, Guid.Empty);
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(2));
+        }
+
+        #endregion
+
+        #region CancelarProcessamentoPedidoCommand tests
+
+        [Fact(DisplayName = "Cancelar Processamento do Pedido com Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task CancelarProcessamentoPedido_PedidoExistente_DeveExecutarComSucesso()
+        {
+            // Arrange
+            var pedidoItemExistente = new PedidoItem(_produtoId, "Produto Xpto", 2, 100);
+            _pedido.AdicionarItem(pedidoItemExistente);
+
+            var pedidoCommand = new CancelarProcessamentoPedidoCommand(_pedido.Id, _clienteId);
+
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.ObterPorId(_pedido.Id))
+                .Returns(Task.FromResult(_pedido));
+            _mocker.GetMock<IPedidoRepository>()
+                .Setup(r => r.UnitOfWork.Commit())
+                .Returns(Task.FromResult(true));
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.True(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Never);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Once);
+        }
+
+        [Fact(DisplayName = "Cancelar Processamento do Pedido sem Sucesso")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task CancelarProcessamentoPedido_PedidoInexistente_DeveOcorrerErroELancarNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new CancelarProcessamentoPedidoCommand(_pedido.Id, _clienteId);
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Once);
+            _mocker.GetMock<IPedidoRepository>().Verify(r => r.UnitOfWork.Commit(), Times.Never);
+        }
+
+        [Fact(DisplayName = "Cancelar Processamento do Pedido Command Inválido")]
+        [Trait("Unit", "Vendas.Application - Pedido Command Handler")]
+        public async Task CancelarProcessamentoPedido_CommandInvalido_DeveRetornarFalsoELancarEventosDeNotificacao()
+        {
+            // Arrange
+            var pedidoCommand = new CancelarProcessamentoPedidoCommand(Guid.Empty, Guid.Empty);
+
+            // Act
+            var result = await _pedidoHandler.Handle(pedidoCommand, CancellationToken.None);
+
+            // Assert
+            Assert.False(result);
+            _mocker.GetMock<IMediatorHandler>().Verify(m => m.PublicarNotificacao(It.IsAny<DomainNotification>()), Times.Exactly(2));
+        }
+
 
         #endregion
     }
