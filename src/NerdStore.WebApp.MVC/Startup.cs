@@ -10,6 +10,7 @@ using NerdStore.Catalogo.Application.AutoMapper;
 using NerdStore.Catalogo.Data;
 using NerdStore.Pagamentos.Data;
 using NerdStore.Vendas.Data.Context;
+using NerdStore.WebApp.MVC.Configurations;
 using NerdStore.WebApp.MVC.Data;
 using NerdStore.WebApp.MVC.Setup;
 
@@ -26,34 +27,26 @@ namespace NerdStore.WebApp.MVC
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(
-                    Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddDbContext<CatalogoContext>(options =>
-                options.UseNpgsql(
-                    Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddDbContext<VendasContext>(options =>
-                options.UseNpgsql(
-                    Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddDbContext<PagamentoContext>(options =>
-                options.UseNpgsql(
-                    Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-
+            // MVC Settings
             services.AddControllersWithViews();
 
-            services.AddAutoMapper(typeof(DomainToViewModelMappingProfile), typeof(ViewModelToDomainMappingProfile));
+            // Setting DBContexts
+            services.AddDatabaseConfiguration(Configuration);
 
+            // Em combinação com UseDeveloperExceptionPage, isso captura exceções relacionadas ao banco de dados que podem ser resolvidas usando Entity Framework migrações. Quando essas exceções ocorrem, uma resposta HTML com detalhes sobre possíveis ações para resolver o problema é gerada.
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
+            // ASP.NET Identity Settings
+            services.AddIdentityConfiguration(Configuration);
+
+            // AutoMapper Settings
+            services.AddAutoMapperConfiguration();
+
+            // Adding MediatR for Domain Events and Notifications
             services.AddMediatR(typeof(Startup));
 
-            services.RegisterServices();
+            // .NET Native DI Abstraction
+            services.AddDependencyInjectionConfiguration();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -66,7 +59,6 @@ namespace NerdStore.WebApp.MVC
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
@@ -75,6 +67,7 @@ namespace NerdStore.WebApp.MVC
             app.UseRouting();
 
             app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
