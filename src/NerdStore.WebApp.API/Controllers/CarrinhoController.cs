@@ -15,9 +15,9 @@ using NerdStore.Core.Communication.Mediator;
 using NerdStore.Core.Messages.CommonMessages.Notifications;
 using NerdStore.Vendas.Application.Commands;
 using NerdStore.Vendas.Application.Queries;
-using NerdStore.WebApp.MVC.Models;
+using NerdStore.WebApp.API.Models;
 
-namespace NerdStore.WebApp.MVC.Controllers
+namespace NerdStore.WebApp.API.Controllers
 {
     [Authorize]
     public class CarrinhoController : ControllerBase
@@ -38,8 +38,8 @@ namespace NerdStore.WebApp.MVC.Controllers
             IHttpContextAccessor httpContextAccessor,
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
-            IOptions<AppSettings> appSettings) : base(notifications, mediatorHandler
-        )
+            IOptions<AppSettings> appSettings
+        ) : base(notifications, mediatorHandler, httpContextAccessor)
         {
             _produtoAppService = produtoAppService;
             _mediatorHandler = mediatorHandler;

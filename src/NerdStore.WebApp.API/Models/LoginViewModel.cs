@@ -1,4 +1,4 @@
-namespace NerdStore.WebApp.MVC.Models
+namespace NerdStore.WebApp.API.Models
 {
     public class LoginViewModel
     {
