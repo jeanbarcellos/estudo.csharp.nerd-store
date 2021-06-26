@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using NerdStore.Vendas.Application.Queries;
 using NerdStore.Core.Communication.Mediator;
 using NerdStore.Core.Messages.CommonMessages.Notifications;
+using Microsoft.AspNetCore.Http;
 
 namespace NerdStore.WebApp.MVC.Controllers
 {
@@ -16,9 +17,10 @@ namespace NerdStore.WebApp.MVC.Controllers
         public PedidoController(
             IPedidoQueries pedidoQueries,
             IMediatorHandler mediatorHandler,
-            INotificationHandler<DomainNotification> notifications
+            INotificationHandler<DomainNotification> notifications,
+            IHttpContextAccessor httpContextAccessor
         )
-            : base(notifications, mediatorHandler)
+            : base(notifications, mediatorHandler, httpContextAccessor)
         {
             _pedidoQueries = pedidoQueries;
         }

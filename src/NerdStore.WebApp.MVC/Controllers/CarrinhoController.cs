@@ -8,9 +8,12 @@ using MediatR;
 using NerdStore.Core.Messages.CommonMessages.Notifications;
 using NerdStore.Vendas.Application.Queries;
 using NerdStore.Vendas.Application.Queries.ViewModels;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NerdStore.WebApp.MVC.Controllers
 {
+    [Authorize]
     public class CarrinhoController : ControllerBase
     {
         private readonly IProdutoAppService _produtoAppService;
@@ -21,8 +24,9 @@ namespace NerdStore.WebApp.MVC.Controllers
             INotificationHandler<DomainNotification> notifications,
             IProdutoAppService produtoAppService,
             IMediatorHandler mediatorHandler,
-            IPedidoQueries pedidoQueries
-        ) : base(notifications, mediatorHandler)
+            IPedidoQueries pedidoQueries,
+            IHttpContextAccessor httpContextAccessor
+        ) : base(notifications, mediatorHandler, httpContextAccessor)
         {
             _produtoAppService = produtoAppService;
             _pedidoQueries = pedidoQueries;
