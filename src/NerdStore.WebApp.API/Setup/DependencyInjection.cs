@@ -21,7 +21,7 @@ using NerdStore.Vendas.Data.Context;
 using NerdStore.Vendas.Data.Repositories;
 using NerdStore.Vendas.Domain;
 
-namespace NerdStore.WebApp.MVC.Setup
+namespace NerdStore.WebApp.API.Setup
 {
     public static class DependencyInjection
     {

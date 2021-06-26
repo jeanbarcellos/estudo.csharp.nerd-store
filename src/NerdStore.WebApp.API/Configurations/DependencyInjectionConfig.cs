@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NerdStore.WebApp.MVC.Setup;
+using NerdStore.WebApp.API.Setup;
 using System;
 
-namespace NerdStore.WebApp.MVC.Configurations
+namespace NerdStore.WebApp.API.Configurations
 {
     public static class DependencyInjectionConfig
     {

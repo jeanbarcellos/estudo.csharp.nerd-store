@@ -2,7 +2,7 @@
 using NerdStore.Catalogo.Application.AutoMapper;
 using System;
 
-namespace NerdStore.WebApp.MVC.Configurations
+namespace NerdStore.WebApp.API.Configurations
 {
     public static class AutoMapperConfig
     {
