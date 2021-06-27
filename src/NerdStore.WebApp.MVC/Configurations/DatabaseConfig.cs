@@ -14,10 +14,7 @@ namespace NerdStore.WebApp.MVC.Configurations
         public static void AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
-
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection")));
+            if (configuration == null) throw new ArgumentException(nameof(configuration));
 
             services.AddDbContext<CatalogoContext>(options =>
                 options.UseNpgsql(
