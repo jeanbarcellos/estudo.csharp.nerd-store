@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NerdStore.Catalogo.Application.Services;
 using NerdStore.Core.Communication.Mediator;
@@ -24,11 +23,10 @@ namespace NerdStore.WebApp.API.Controllers
 
         public CarrinhoController(
             INotificationHandler<DomainNotification> notifications,
-            IProdutoAppService produtoAppService,
             IMediatorHandler mediatorHandler,
-            IPedidoQueries pedidoQueries,
             IHttpContextAccessor httpContextAccessor,
-            SignInManager<IdentityUser> signInManager
+            IProdutoAppService produtoAppService,
+            IPedidoQueries pedidoQueries
         ) : base(notifications, mediatorHandler, httpContextAccessor)
         {
             _produtoAppService = produtoAppService;
@@ -82,6 +80,34 @@ namespace NerdStore.WebApp.API.Controllers
             if (produto == null) return BadRequest();
 
             var command = new RemoverItemPedidoCommand(ClienteId, id);
+            await _mediatorHandler.EnviarComando(command);
+
+            return Response();
+        }
+
+        [HttpPost]
+        [Route("aplicar-voucher")]
+        public async Task<IActionResult> AplicarVoucher([FromBody] VoucherViewModel voucher)
+        {
+            var command = new AplicarVoucherPedidoCommand(ClienteId, voucher.Codigo);
+            await _mediatorHandler.EnviarComando(command);
+
+            return Response();
+        }
+
+        [HttpPost]
+        [Route("iniciar-pedido")]
+        public async Task<IActionResult> IniciarPedido([FromBody] CarrinhoPagamentoViewModel carrinhoPagamentoViewModel)
+        {
+            var carrinho = await _pedidoQueries.ObterCarrinhoCliente(ClienteId);
+            if (carrinho == null) return BadRequest();
+
+            var command = new IniciarPedidoCommand(
+                carrinho.PedidoId, ClienteId, carrinho.ValorTotal,
+                carrinhoPagamentoViewModel.NomeCartao, carrinhoPagamentoViewModel.NumeroCartao,
+                carrinhoPagamentoViewModel.ExpiracaoCartao, carrinhoPagamentoViewModel.CVVCartao
+            );
+
             await _mediatorHandler.EnviarComando(command);
 
             return Response();
