@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NerdStore.Catalogo.Application.Services;
 using NerdStore.Catalogo.Application.ViewModels;
 using System;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace NerdStore.WebApp.MVC.Controllers.Admin
 {
+    [Authorize]
     public class AdminProdutosController : Controller
     {
         private readonly IProdutoAppService _produtoAppService;
