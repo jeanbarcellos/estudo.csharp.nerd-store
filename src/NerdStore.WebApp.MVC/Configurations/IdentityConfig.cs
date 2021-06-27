@@ -18,7 +18,7 @@ namespace NerdStore.WebApp.MVC.Configurations
             // Default EF Context for Identity | Equinox : AddIdentityEntityFrameworkContextConfiguration
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection")));
+                    configuration.GetConnectionString("IdentityConnection")));
 
             // Default Identity configuration | Equinox : AddIdentityConfiguration
             services.AddDefaultIdentity<IdentityUser>()

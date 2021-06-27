@@ -17,15 +17,15 @@ namespace NerdStore.WebApp.MVC.Configurations
 
             services.AddDbContext<CatalogoContext>(options =>
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection")));
+                    configuration.GetConnectionString("CatalogoConnection")));
 
             services.AddDbContext<VendasContext>(options =>
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection")));
+                    configuration.GetConnectionString("VendasConnection")));
 
             services.AddDbContext<PagamentosContext>(options =>
                 options.UseNpgsql(
-                    configuration.GetConnectionString("DefaultConnection")));
+                    configuration.GetConnectionString("PagamentosConnection")));
         }
     }
 }
