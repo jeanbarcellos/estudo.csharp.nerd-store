@@ -81,7 +81,7 @@ namespace NerdStore.WebApp.MVC.Setup
             /*
              * # Bounded Context Pagamento
              */
-            services.AddScoped<PagamentoContext>();
+            services.AddScoped<PagamentosContext>();
             services.AddScoped<IPagamentoRepository, PagamentoRepository>();
             services.AddScoped<IPagamentoCartaoCreditoFacade, PagamentoCartaoCreditoFacade>();
             services.AddScoped<IPagamentoService, PagamentoService>();

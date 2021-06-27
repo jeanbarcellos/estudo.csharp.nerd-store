@@ -23,7 +23,7 @@ namespace NerdStore.WebApp.API.Configurations
                 options.UseNpgsql(
                     configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDbContext<PagamentoContext>(options =>
+            services.AddDbContext<PagamentosContext>(options =>
                 options.UseNpgsql(
                     configuration.GetConnectionString("DefaultConnection")));
         }

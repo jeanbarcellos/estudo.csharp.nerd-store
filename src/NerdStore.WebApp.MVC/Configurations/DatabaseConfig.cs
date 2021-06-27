@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using NerdStore.Catalogo.Data;
 using NerdStore.Pagamentos.Data;
 using NerdStore.Vendas.Data.Context;
-using NerdStore.WebApp.MVC.Data;
 using System;
 
 namespace NerdStore.WebApp.MVC.Configurations
@@ -24,7 +23,7 @@ namespace NerdStore.WebApp.MVC.Configurations
                 options.UseNpgsql(
                     configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDbContext<PagamentoContext>(options =>
+            services.AddDbContext<PagamentosContext>(options =>
                 options.UseNpgsql(
                     configuration.GetConnectionString("DefaultConnection")));
         }

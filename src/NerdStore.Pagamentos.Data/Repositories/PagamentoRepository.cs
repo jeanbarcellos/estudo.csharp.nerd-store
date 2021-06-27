@@ -6,9 +6,9 @@ namespace NerdStore.Pagamentos.Data.Repositories
 {
     public class PagamentoRepository : IPagamentoRepository
     {
-        private readonly PagamentoContext _context;
+        private readonly PagamentosContext _context;
 
-        public PagamentoRepository(PagamentoContext context)
+        public PagamentoRepository(PagamentosContext context)
         {
             _context = context;
         }

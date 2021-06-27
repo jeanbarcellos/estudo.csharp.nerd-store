@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace NerdStore.Pagamentos.Data.Migrations
 {
-    [DbContext(typeof(PagamentoContext))]
+    [DbContext(typeof(PagamentosContext))]
     [Migration("20210615002812_initial")]
     partial class initial
     {

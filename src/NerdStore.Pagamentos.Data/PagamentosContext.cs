@@ -10,14 +10,14 @@ using NerdStore.Pagamentos.Data.Extensions;
 
 namespace NerdStore.Pagamentos.Data
 {
-    public class PagamentoContext : DbContext, IUnitOfWork
+    public class PagamentosContext : DbContext, IUnitOfWork
     {
         private readonly IMediatorHandler _mediatorHandler;
 
         public DbSet<Pagamento> Pagamentos { get; set; }
         public DbSet<Transacao> Transacoes { get; set; }
 
-        public PagamentoContext(DbContextOptions<PagamentoContext> options, IMediatorHandler mediatorHandler)
+        public PagamentosContext(DbContextOptions<PagamentosContext> options, IMediatorHandler mediatorHandler)
             : base(options)
         {
             _mediatorHandler = mediatorHandler;
