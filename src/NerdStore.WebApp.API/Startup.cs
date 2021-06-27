@@ -22,7 +22,7 @@ namespace NerdStore.WebApp.API
             // WebAPI Settings
             services.AddControllers();
 
-            // Database Settings
+            // DBContexts Settings
             services.AddDatabaseConfiguration(Configuration);
 
             // ASP.NET Identity Settings & JWT
@@ -52,7 +52,14 @@ namespace NerdStore.WebApp.API
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseCors(c =>
+            {
+                c.AllowAnyHeader();
+                c.AllowAnyMethod();
+                c.AllowAnyOrigin();
+            });
+
+            app.UseAuthConfiguration();
 
             app.UseEndpoints(endpoints =>
             {

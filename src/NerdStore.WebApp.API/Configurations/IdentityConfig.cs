@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -15,13 +18,19 @@ namespace NerdStore.WebApp.API.Configurations
         public static void AddIdentityConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
+            if (configuration == null) throw new ArgumentException(nameof(configuration));
 
-            // Identity
+            // Default EF Context for Identity | Equinox : AddIdentityEntityFrameworkContextConfiguration
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(
+                    configuration.GetConnectionString("DefaultConnection")));
+
+            // Default Identity configuration | Equinox : AddIdentityConfiguration
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            // JWT
+            // Default JWT configuration | Equinox : AddJwtConfiguration
             var appSettingsSection = configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
@@ -47,6 +56,19 @@ namespace NerdStore.WebApp.API.Configurations
                 };
             });
 
+            // Interactive AspNetUser (logged in) | Equinox : AddAspNetUserConfiguration
+            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        }
+
+        public static IApplicationBuilder UseAuthConfiguration(this IApplicationBuilder app)
+        {
+            if (app == null) throw new ArgumentException(nameof(app));
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
+            return app;
         }
     }
 }
