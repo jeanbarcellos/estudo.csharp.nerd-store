@@ -53,8 +53,10 @@ namespace NerdStore.WebApp.MVC
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
-            //app.UseStaticFiles();
+
+            app.UseStaticFiles();
 
             app.UseRouting();
 
