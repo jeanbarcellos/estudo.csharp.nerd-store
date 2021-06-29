@@ -12,9 +12,15 @@ namespace NerdStore.WebApp.API
     {
         public IConfiguration Configuration { get; }
 
-        public StartupTests(IConfiguration configuration)
+        public StartupTests(IHostEnvironment hostEnvironment)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(hostEnvironment.ContentRootPath)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{hostEnvironment.EnvironmentName}.json", true, true)
+                .AddEnvironmentVariables();
+
+            Configuration = builder.Build();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -36,9 +42,6 @@ namespace NerdStore.WebApp.API
 
             // DI Abstraction
             services.AddDependencyInjectionConfiguration();
-
-            // Swagger Settings
-            services.AddSwaggerConfiguration();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -65,8 +68,6 @@ namespace NerdStore.WebApp.API
             {
                 endpoints.MapControllers();
             });
-
-            app.UseSwaggerSetup();
         }
     }
 }
