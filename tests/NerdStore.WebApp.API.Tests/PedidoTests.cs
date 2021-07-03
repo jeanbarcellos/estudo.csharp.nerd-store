@@ -15,7 +15,6 @@ namespace NerdStore.WebApp.API.Tests
         private Guid _produtoId;
         private string _voucherValor;
 
-
         public PedidoTests(IntegrationTestsFixture<StartupTests> testsFixture)
         {
             _testsFixture = testsFixture;
@@ -114,6 +113,22 @@ namespace NerdStore.WebApp.API.Tests
             // Assert
             deleteResponse.EnsureSuccessStatusCode();
         }
+
+        [Fact(DisplayName = "Listar pedidos realizados"), TestPriority(20)]
+        [Trait("Integration", "WebApp.API - Pedido")]
+        public async Task ListarPedidos_PedidosRealizados_DeveRetornarComSucesso()
+        {
+            // Arrange
+            await _testsFixture.RealizarLogin();
+            _testsFixture.Client.AtribuirToken(_testsFixture.UsuarioToken);
+
+            // Act
+            var getResponse = await _testsFixture.Client.GetAsync("api/pedidos");
+
+            // Assert
+            getResponse.EnsureSuccessStatusCode();
+        }
+
 
     }
 }
