@@ -31,17 +31,17 @@ namespace NerdStore.WebApp.API
             // DBContexts Settings
             services.AddDatabaseConfiguration(Configuration);
 
-            // ASP.NET Identity Settings & JWT
-            services.AddIdentityConfiguration(Configuration);
+            //// ASP.NET Identity Settings & JWT
+            //services.AddIdentityConfiguration(Configuration);
 
-            // AutoMapper Settings
-            services.AddAutoMapperConfiguration();
+            //// AutoMapper Settings
+            //services.AddAutoMapperConfiguration();
 
-            // Adding MediatR for Domain Events and Notifications
-            services.AddMediatR(typeof(Startup));
+            //// Adding MediatR for Domain Events and Notifications
+            //services.AddMediatR(typeof(Startup));
 
-            // DI Abstraction
-            services.AddDependencyInjectionConfiguration();
+            //// DI Abstraction
+            //services.AddDependencyInjectionConfiguration();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
