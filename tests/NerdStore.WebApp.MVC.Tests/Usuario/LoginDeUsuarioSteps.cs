@@ -1,69 +1,56 @@
-﻿using System;
+﻿using NerdStore.WebApp.MVC.Tests.Config;
 using TechTalk.SpecFlow;
+using Xunit;
 
 namespace NerdStore.WebApp.MVC.Tests.Usuario
 {
     [Binding]
+    [CollectionDefinition(nameof(AutomacaoWebFixtureCollection))]
     public class LoginDeUsuarioSteps
     {
-        [Given(@"Que o visitante está acessando o site da loja")]
-        public void DadoQueOVisitanteEstaAcessandoOSiteDaLoja()
+        private readonly LoginDeUsuarioTela _loginUsuarioTela;
+        private readonly AutomacaoWebTestsFixture _testsFixture;
+
+        public LoginDeUsuarioSteps(AutomacaoWebTestsFixture testsFixture)
         {
-            // Arrange
-
-            // Act
-
-            // Assert
+            _testsFixture = testsFixture;
+            _loginUsuarioTela = new LoginDeUsuarioTela(testsFixture.BrowserHelper);
         }
 
         [When(@"Ele clicar em login")]
         public void QuandoEleClicarEmLogin()
         {
-            // Arrange
-
             // Act
+            _loginUsuarioTela.ClicarNoLinkLogin();
 
             // Assert
+            Assert.Contains(_testsFixture.Configuration.LoginUrl,
+                _loginUsuarioTela.ObterUrl());
         }
+
 
         [When(@"Preencher os dados do formulario de login")]
         public void QuandoPreencherOsDadosDoFormularioDeLogin(Table table)
         {
             // Arrange
+            var usuario = new Usuario
+            {
+                Email = "teste@teste.com",
+                Senha = "Teste@123"
+            };
+            _testsFixture.Usuario = usuario;
 
             // Act
+            _loginUsuarioTela.PreencherFormularioLogin(usuario);
 
             // Assert
+            Assert.True(_loginUsuarioTela.ValidarPreenchimentoFormularioLogin(usuario));
         }
 
         [When(@"Clicar no botão login")]
         public void QuandoClicarNoBotaoLogin()
         {
-            // Arrange
-
-            // Act
-
-            // Assert
-        }
-
-        [Then(@"Ele será redirecionado para a vitrine")]
-        public void EntaoEleSeraRedirecionadoParaAVitrine()
-        {
-            // Arrange
-
-            // Act
-
-            // Assert
-        }
-
-        [Then(@"Uma saudação com seu e-mail será exibida no menu superior")]
-        public void EntaoUmaSaudacaoComSeuE_MailSeraExibidaNoMenuSuperior()
-        {
-            // Arrange
-
-            // Act
-
-            // Assert
+            _loginUsuarioTela.ClicarNoBotaoLogin();
         }
     }
 }
