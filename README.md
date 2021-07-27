@@ -229,3 +229,128 @@ Usar uma flag indicando que um pedido teve um voucher de desconto aplicado e o v
 
    1. Verificar se é um pedido novo ou em andamento
    2. Verificar se o item já foi adicionado a lista
+
+## Testes
+
+Tipos de testes comuns:
+
+- Tesste de Unidade
+- Testes de Integração
+- Testes Automatizados
+- Testes de Carga
+
+### **Testes de Unidade**
+
+- XUnit.net
+
+  - Escrito pelos criados do NUnit
+  - Compatível com o Visual Studio
+  - Utilizado pelo time de desenvolvimento do .NET Core e ASP.NET
+
+- Instalação do framework
+
+  ```
+  Install-Package xunit
+  ```
+
+- Instalação para reconhecimento do Visual Studio
+
+  ```
+  Install-Package xunit.runner.visualstudio
+  ```
+
+### **Padrões e Nomenclaturas**
+
+**AAA - Arrange, Act, Assert**
+
+- Arrange – Arranjar (preparar os dados que serão testados)
+- Act – Atuação - A execução do teste
+- Assert – Asserção – Validar se o resultado confere com a intenção dos testes
+
+**Nomenclatura de Testes de unidade**
+
+**_ObjetoEmTeste_MetodoComportamentoEmTeste_ComportamentoEsperado_**
+
+- Pedido_AdicionarPedidoItem_DeveIncrementarUnidadesSeItemJaExistente
+- Estoque_RetirarItem_DeveEnviarEmailSeAbaixoDe10Unidades
+
+**_MetodoEmTeste_EstadoEmTeste_ComportamentoEsperado_**
+
+- AdicionarPedidoItem_ItemExisteCarrinho_DeveIncrementarUnidadesDoItem
+- RetirarItemEstoque_EstoqueAbaixoDe10Unidades_DeveEnviarEmailDeAviso
+
+### **Testes de Integração**
+
+...
+
+### **BDD **
+
+**SpecFlow**
+
+- Versão do Cocumber para .ET
+- Utilizar o Gherkin Parser para transformar o texto em ações
+- Compatível com todas as versões do VC atuais
+
+Link: https://specflow.org/
+
+Instalação do framework
+
+```
+Install-Package SpecFlow
+```
+
+Instalação para reconhecimento do Visual Studio com XUnit
+
+```
+Install-Package SpecFlow.xUnit
+```
+
+Passo a passo
+
+1. No Visual Studio
+2. Barra de menu > Extensions > Manage Extensions
+3. Ir em Online
+4. Pequisar por SpecFlow e instalar
+
+
+
+...
+
+
+### **Testes Automatizados **
+
+- **Apresentação**
+
+  - Utilização do Selenium
+  - Page Object Model
+  - Testes de Aceitação / regreção com SpecFlow
+  - Boas Práticas no design dos testes
+
+- **Selenium**
+  - Realiza a automação de ações para browsers
+  - Utilizado para automação de testes e Web Crawling
+  - Compatível com Visual Studio
+
+**Driver do Google Chrome para utilização do Selenium**
+
+- Baixar o driver
+  - Link: https://chromedriver.chromium.org/downloads
+    - ATENÇÃO: Baixar a mesma versão do navegador atual
+- Colocar o arquivo `chromedriver` em `C:\WebDriver`
+- Instalar os pacotes
+  ```
+  Install-Package Selenium.WebDriver
+  Install-Package Selenium.Support
+  ```
+
+<br><br><br>
+
+## Trabalhos Futuros
+
+### **BUG a resolver**
+
+Há un bug em um teste, decorrido de um lançamento de uma DomainException, no qual deveria ser trabada.
+
+### **Inglês*
+
+Traduzir para inglês todo o APP
