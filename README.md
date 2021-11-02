@@ -283,7 +283,7 @@ Tipos de testes comuns:
 
 ...
 
-### **BDD **
+### **BDD**
 
 **SpecFlow**
 
