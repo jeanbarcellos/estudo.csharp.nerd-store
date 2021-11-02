@@ -161,7 +161,7 @@ namespace NerdStore.WebApp.MVC.Tests.Pedido
         public void QuandoOUsuarioAdicionarAQuantidadeMaximaPermitidaAoCarrinho()
         {
             // Arrange
-            _pedidoTela.ClicarAdicionarQuantidadeItens(Vendas.Domain.Pedido.MAX_UNIDADES_ITEM);
+            _pedidoTela.ClicarAdicionarQuantidadeItens(Vendas.Domain.Pedido.MAX_UNIDADES_ITEM + 1);
 
             // Act
             _pedidoTela.ClicarEmComprarAgora();
