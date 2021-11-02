@@ -19,7 +19,8 @@ namespace NerdStore.WebApp.API.Controllers
             IMediatorHandler mediatorHandler,
             IHttpContextAccessor httpContextAccessor,
             IProdutoAppService produtoAppService
-        ) : base(notifications, mediatorHandler, httpContextAccessor)
+        )
+            : base(notifications, mediatorHandler, httpContextAccessor)
         {
             _produtoAppService = produtoAppService;
         }

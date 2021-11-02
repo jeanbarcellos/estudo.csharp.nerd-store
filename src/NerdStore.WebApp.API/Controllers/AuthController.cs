@@ -24,13 +24,14 @@ namespace NerdStore.WebApp.API.Controllers
         private readonly AppSettings _appSettings;
 
         public AuthController(
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            IOptions<AppSettings> appSettings,
             INotificationHandler<DomainNotification> notifications,
             IMediatorHandler mediatorHandler,
-            IHttpContextAccessor httpContextAccessor,
-            SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager,
-            IOptions<AppSettings> appSettings
-        ) : base(notifications, mediatorHandler, httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor
+        )
+            : base(notifications, mediatorHandler, httpContextAccessor)
         {
             _signInManager = signInManager;
             _userManager = userManager;

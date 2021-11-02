@@ -16,8 +16,8 @@ namespace NerdStore.WebApp.API.Controllers
 
         public PedidoController(
             IPedidoQueries pedidoQueries,
-            IMediatorHandler mediatorHandler,
             INotificationHandler<DomainNotification> notifications,
+            IMediatorHandler mediatorHandler,
             IHttpContextAccessor httpContextAccessor
         )
             : base(notifications, mediatorHandler, httpContextAccessor)

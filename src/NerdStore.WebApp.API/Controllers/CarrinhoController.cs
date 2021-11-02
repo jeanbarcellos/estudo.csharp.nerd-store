@@ -22,12 +22,13 @@ namespace NerdStore.WebApp.API.Controllers
         private readonly IMediatorHandler _mediatorHandler;
 
         public CarrinhoController(
+            IProdutoAppService produtoAppService,
+            IPedidoQueries pedidoQueries,
             INotificationHandler<DomainNotification> notifications,
             IMediatorHandler mediatorHandler,
-            IHttpContextAccessor httpContextAccessor,
-            IProdutoAppService produtoAppService,
-            IPedidoQueries pedidoQueries
-        ) : base(notifications, mediatorHandler, httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor
+        )
+            : base(notifications, mediatorHandler, httpContextAccessor)
         {
             _produtoAppService = produtoAppService;
             _mediatorHandler = mediatorHandler;
@@ -103,9 +104,13 @@ namespace NerdStore.WebApp.API.Controllers
             if (carrinho == null) return BadRequest();
 
             var command = new IniciarPedidoCommand(
-                carrinho.PedidoId, ClienteId, carrinho.ValorTotal,
-                carrinhoPagamentoViewModel.NomeCartao, carrinhoPagamentoViewModel.NumeroCartao,
-                carrinhoPagamentoViewModel.ExpiracaoCartao, carrinhoPagamentoViewModel.CVVCartao
+                carrinho.PedidoId,
+                ClienteId,
+                carrinho.ValorTotal,
+                carrinhoPagamentoViewModel.NomeCartao,
+                carrinhoPagamentoViewModel.NumeroCartao,
+                carrinhoPagamentoViewModel.ExpiracaoCartao,
+                carrinhoPagamentoViewModel.CVVCartao
             );
 
             await _mediatorHandler.EnviarComando(command);
