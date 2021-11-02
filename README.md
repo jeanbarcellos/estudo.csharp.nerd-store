@@ -312,10 +312,7 @@ Passo a passo
 3. Ir em Online
 4. Pequisar por SpecFlow e instalar
 
-
-
 ...
-
 
 ### **Testes Automatizados **
 
@@ -345,12 +342,20 @@ Passo a passo
 
 <br><br><br>
 
-## Trabalhos Futuros
+## TO-DO / Trabalhos Futuros
 
-### **BUG a resolver**
+### **1. Testes faltantes**
 
-Há un bug em um teste, decorrido de um lançamento de uma DomainException, no qual deveria ser trabada.
+- Criar testes para os pacotes
+  - Core
+  - Pagamentos.Business
 
-### **Inglês*
+### **2. EventSourcing**
 
-Traduzir para inglês todo o APP
+- Adicionar o pacote `EventSourcing` ao projeto e fazer sua implementação.
+  - Como no curso `Modelagem de domínios Ricos` tem uma demonstração de como usar `Event Sourcing`, fazer esta implementação também aqui.
+  - Adicionar configuração para tonar opcional o uso
+
+### **3. Conteinerizar**
+
+- Criar containers docker para os bancos de dados e projetos
